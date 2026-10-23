@@ -5,6 +5,7 @@ import react from '@vitejs/plugin-react';
 // Same origin => the HttpOnly auth cookie and the CSRF cookie "just work", no CORS needed.
 const backend = 'http://localhost:8080';
 export default defineConfig({
+  envPrefix: ['VITE_', 'BACKEND_URL'],
   plugins: [react()],
   server: {
     port: 5173,

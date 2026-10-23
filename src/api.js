@@ -1,8 +1,10 @@
 import axios from 'axios';
 
+export const backendUrl = import.meta.env.BACKEND_URL?.replace(/\/+$/, '') || '';
+
 // Cookie-based auth + CSRF: axios copies the XSRF-TOKEN cookie into the X-XSRF-TOKEN header on every write.
 export const api = axios.create({
-  baseURL: '/api',
+  baseURL: backendUrl ? `${backendUrl}/api` : '/api',
   withCredentials: true,
   withXSRFToken: true,
   xsrfCookieName: 'XSRF-TOKEN',
