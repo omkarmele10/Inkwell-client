@@ -1,7 +1,7 @@
 import { Link, Navigate, useSearchParams, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { api, backendUrl, errorMessage } from '../api';
+import { api, errorMessage } from '../api';
 import { useMe } from '../hooks';
 
 const MESSAGES = {
@@ -45,7 +45,7 @@ export default function LoginPage() {
       </p>
       {mode === 'login' && <p><Link to="/reset-password" className="link-btn">Forgot password?</Link></p>}
       <div className="auth-divider"><span>or</span></div>
-      <a className="btn auth-google" href={`${backendUrl}/oauth2/authorization/google`}>Continue with Google</a>
+      <a className="btn auth-google" href="/oauth2/authorization/google">Continue with Google</a>
     </div>
   );
 }
