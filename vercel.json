@@ -1,7 +1,0 @@
-{
-  "rewrites": [
-    { "source": "/api/:path*", "destination": "$BACKEND_URL/api/:path*" },
-    { "source": "/oauth2/:path*", "destination": "$BACKEND_URL/oauth2/:path*" },
-    { "source": "/login/oauth2/:path*", "destination": "$BACKEND_URL/login/oauth2/:path*" }
-  ]
-}

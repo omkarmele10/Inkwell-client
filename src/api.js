@@ -1,12 +1,30 @@
 import axios from 'axios';
 
-// Cookie-based auth + CSRF: axios copies the XSRF-TOKEN cookie into the X-XSRF-TOKEN header on every write.
+export const backendUrl = import.meta.env.BACKEND_URL?.replace(/\/+$/, '');
+
+if (!backendUrl) {
+  throw new Error('BACKEND_URL must be set when building the frontend.');
+}
+
+let csrfToken;
+
+// Cookie-based auth + CSRF: the backend returns a CSRF token header that is echoed on writes.
 export const api = axios.create({
-  baseURL: '/api',
+  baseURL: `${backendUrl}/api`,
   withCredentials: true,
-  withXSRFToken: true,
-  xsrfCookieName: 'XSRF-TOKEN',
-  xsrfHeaderName: 'X-XSRF-TOKEN',
+});
+
+api.interceptors.request.use(async (config) => {
+  const method = (config.method || 'get').toLowerCase();
+  if (!['get', 'head', 'options'].includes(method)) {
+    if (!csrfToken) {
+      const response = await axios.get(`${backendUrl}/api/auth/csrf`, { withCredentials: true });
+      csrfToken = response.headers['x-csrf-token'];
+      if (!csrfToken) throw new Error('Backend did not provide a CSRF token.');
+    }
+    config.headers.set('X-XSRF-TOKEN', csrfToken);
+  }
+  return config;
 });
 
 /** Human-readable message from a Spring ProblemDetail response. */
