@@ -111,7 +111,7 @@ export default function Home() {
           key={`${tag}|${searchQuery}|${tab}`}
           queryKey={[tag ?? '', searchQuery ?? '', following ? 'following' : myArticles ? 'my' : tab]}
           path={following ? '/articles/following' : myArticles ? '/articles/mine' : '/articles'}
-          params={{ tag, q: searchQuery, sort: tab === 'popular' ? 'popular' : 'latest' }}
+          params={{ hashtag: tag, q: searchQuery, sort: tab === 'popular' ? 'popular' : 'latest' }}
         />
       </section>
       <Sidebar me={me} />
