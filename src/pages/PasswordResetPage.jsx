@@ -12,8 +12,14 @@ export default function PasswordResetPage() {
   const navigate = useNavigate();
 
   const requestReset = useMutation({
-    mutationFn: () => api.post('/auth/forgot-password', { email }),
-    onSuccess: ({ data }) => setRequestStatus(data.status),
+    mutationFn: async () => {
+      const { data } = await api.post('/auth/forgot-password', { email });
+      if (!['USER_NOT_FOUND', 'EMAIL_SENT', 'EMAIL_UNAVAILABLE'].includes(data.status)) {
+        throw new Error('The backend returned an unexpected password-reset response.');
+      }
+      return data.status;
+    },
+    onSuccess: setRequestStatus,
   });
   const resetPassword = useMutation({
     mutationFn: () => api.post('/auth/reset-password', { token, password }),
@@ -52,8 +58,16 @@ export default function PasswordResetPage() {
             <input className="field" type="email" autoComplete="email" value={email}
               onChange={(event) => setEmail(event.target.value)} required />
           </label>
-          {requestReset.isError && <p className="error" role="alert">{errorMessage(requestReset.error)}</p>}
-          <button className="btn btn-dark auth-submit" disabled={requestReset.isPending}>Send reset link</button>
+          {requestReset.isError && (
+            <p className="error" role="alert">
+              {requestReset.error.response
+                ? errorMessage(requestReset.error)
+                : 'Could not reach the backend. Check that it is running and that BACKEND_URL and backend CORS are configured correctly.'}
+            </p>
+          )}
+          <button className="btn btn-dark auth-submit" disabled={requestReset.isPending}>
+            {requestReset.isPending ? 'Sending…' : 'Send reset link'}
+          </button>
         </form>
       )}
       <p><Link to="/login" className="link-btn">Back to sign in</Link></p>
