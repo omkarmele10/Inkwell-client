@@ -23,7 +23,12 @@ export default function LoginPage() {
   const queryClient = useQueryClient();
   const auth = useMutation({
     mutationFn: () => api.post(`/auth/${mode === 'register' ? 'register' : 'login'}`, { email, password, ...(mode === 'register' ? { name } : {}) }),
-    onSuccess: ({ data }) => { queryClient.setQueryData(['me'], data); navigate('/'); },
+    onSuccess: ({ data }) => {
+      sessionStorage.setItem('access_token', data.accessToken);
+      const { accessToken, ...me } = data;
+      queryClient.setQueryData(['me'], me);
+      navigate('/');
+    },
   });
   if (isLoading) return null;
   if (me) return <Navigate to="/" replace />;

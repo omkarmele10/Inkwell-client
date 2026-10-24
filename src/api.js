@@ -6,24 +6,13 @@ if (!backendUrl) {
   throw new Error('BACKEND_URL must be set when building the frontend.');
 }
 
-let csrfToken;
-
-// Cookie-based auth + CSRF: the backend returns a CSRF token header that is echoed on writes.
 export const api = axios.create({
   baseURL: `${backendUrl}/api`,
-  withCredentials: true,
 });
 
 api.interceptors.request.use(async (config) => {
-  const method = (config.method || 'get').toLowerCase();
-  if (!['get', 'head', 'options'].includes(method)) {
-    if (!csrfToken) {
-      const response = await axios.get(`${backendUrl}/api/auth/csrf`, { withCredentials: true });
-      csrfToken = response.headers['x-csrf-token'];
-      if (!csrfToken) throw new Error('Backend did not provide a CSRF token.');
-    }
-    config.headers.set('X-XSRF-TOKEN', csrfToken);
-  }
+  const token = sessionStorage.getItem('access_token');
+  if (token) config.headers.set('Authorization', `Bearer ${token}`);
   return config;
 });
 

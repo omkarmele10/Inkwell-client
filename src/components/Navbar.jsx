@@ -86,7 +86,11 @@ function UserMenu({ me }) {
   const navigate = useNavigate();
   const logout = useMutation({
     mutationFn: () => api.post('/auth/logout'),
-    onSuccess: () => { queryClient.clear(); navigate('/'); },
+    onSettled: () => {
+      sessionStorage.removeItem('access_token');
+      queryClient.clear();
+      navigate('/');
+    },
   });
   return (
     <div className="menu-wrap">
