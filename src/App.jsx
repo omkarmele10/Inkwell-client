@@ -7,11 +7,13 @@ import ProfilePage from './pages/ProfilePage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import PasswordResetPage from './pages/PasswordResetPage.jsx';
 import Footer from './components/Footer.jsx';
+import BackendStatus from './components/BackendStatus.jsx';
 
 export default function App() {
   return (
     <div className="app-shell">
       <Navbar />
+      <BackendStatus />
       <main className="page">
         <Routes>
           <Route path="/" element={<Home />} />
