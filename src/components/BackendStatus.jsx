@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useIsFetching, useQueryClient } from '@tanstack/react-query';
 
+function isBackendUnavailable(error) {
+  return !error?.response || error.response.status >= 500;
+}
+
 export default function BackendStatus() {
   const queryClient = useQueryClient();
   const isFetching = useIsFetching();
@@ -21,15 +25,23 @@ export default function BackendStatus() {
   useEffect(() => queryClient.getQueryCache().subscribe((event) => {
     if (event.type !== 'updated') return;
 
-    if (event.action.type === 'error') {
-      const error = event.query.state.error;
-      if (!error?.response || error.response.status >= 500) {
-        setHasConnectionError(true);
-      }
-    } else if (event.action.type === 'success') {
-      setHasConnectionError(false);
-    }
+    setHasConnectionError(queryClient.getQueryCache().getAll().some((query) => (
+      query.state.status === 'error' && isBackendUnavailable(query.state.error)
+    )));
   }), [queryClient]);
+
+  useEffect(() => {
+    if (!hasConnectionError) return undefined;
+
+    const retryId = window.setInterval(() => {
+      void queryClient.refetchQueries({
+        type: 'active',
+        predicate: (query) => query.state.status === 'error' && isBackendUnavailable(query.state.error),
+      });
+    }, 2000);
+
+    return () => window.clearInterval(retryId);
+  }, [hasConnectionError, queryClient]);
 
   if (!isSlow && !hasConnectionError) return null;
 
@@ -39,12 +51,9 @@ export default function BackendStatus() {
         <strong>Our backend server is waking up</strong>
         <p>
           The server may be sleeping after a period of inactivity. It can take up to a minute to
-          start. Please wait; if the page still hasn’t loaded after a minute, refresh and try again.
+          start. Please wait; we’ll retry automatically until it responds.
         </p>
       </div>
-      <button className="btn btn-sm" onClick={() => window.location.reload()}>
-        Refresh page
-      </button>
     </aside>
   );
 }

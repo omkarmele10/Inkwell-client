@@ -19,7 +19,6 @@ h1, h2, h3 { font-family: var(--serif); line-height: 1.15; margin: 0; }
 .backend-status { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px 48px; background: var(--tint); border-bottom: 1px solid #f3d4c2; color: var(--body); }
 .backend-status strong { color: var(--accent-ink); }
 .backend-status p { margin: 4px 0 0; font-size: 14px; }
-.backend-status .btn { flex: none; }
 
 /* navbar */
 .nav { display: flex; align-items: center; gap: 20px; padding: 14px 48px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--paper); z-index: 10; }
