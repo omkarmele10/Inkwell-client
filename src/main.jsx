@@ -7,7 +7,16 @@ import App from './App.jsx';
 import { backendUrl } from './api.js';
 import './styles.css';
 
-const queryClient = new QueryClient({ defaultOptions: { queries: { refetchOnWindowFocus: false, staleTime: 30_000 } } });
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      staleTime: 30_000,
+      retry: (_failureCount, error) => !error?.response || error.response.status >= 500,
+      retryDelay: 20,// 20ms delay between retries
+    },
+  },
+});
 
 async function startApp() {
   const url = new URL(window.location.href);
